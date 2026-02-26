@@ -1,0 +1,303 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #faf8f4;
+    background-image: radial-gradient(#ddd5c3 0.8px, transparent 0.8px);
+    background-size: 16px 16px;
+    color: #1a1a1a;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.page {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem;
+}
+
+/* ---- Header ---- */
+
+.header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 3px double #1a1a1a;
+}
+
+.title {
+    font-size: 2.8rem;
+    font-weight: 400;
+    letter-spacing: -2px;
+    text-transform: lowercase;
+}
+
+.subtitle {
+    font-style: italic;
+    color: #777;
+    margin-top: 0.3rem;
+    font-size: 1rem;
+}
+
+/* ---- Restaurant Cards ---- */
+
+.card {
+    background: #fff;
+    border: 2px solid #1a1a1a;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.card-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    border-bottom: 2px solid #1a1a1a;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.15rem;
+}
+
+.card-address {
+    font-size: 0.85rem;
+    color: #999;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.card-desc {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.card-note {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #888;
+}
+
+/* ---- Drop Countdown Box ---- */
+
+.drop-box {
+    background: #f7f3eb;
+    border: 1px solid #d9cdb7;
+    padding: 1rem 1.25rem;
+    margin-top: 1.25rem;
+}
+
+.drop-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #999;
+    margin-bottom: 0.4rem;
+}
+
+.countdown {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.countdown.urgent {
+    color: #c0392b;
+}
+
+.drop-detail {
+    font-size: 0.85rem;
+    color: #777;
+    margin-top: 0.3rem;
+}
+
+.drop-schedule {
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-top: 0.2rem;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* ---- Availability Controls ---- */
+
+.availability-controls {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.control-group label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #999;
+}
+
+.control-group select,
+.control-group input[type="date"] {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #1a1a1a;
+}
+
+.btn {
+    font-family: Georgia, serif;
+    font-size: 0.85rem;
+    padding: 0.45rem 1rem;
+    border: 2px solid #1a1a1a;
+    background: #1a1a1a;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background: #444;
+    border-color: #444;
+}
+
+/* ---- Time Slots ---- */
+
+.slots-section {
+    margin-top: 1.25rem;
+}
+
+.slots-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #999;
+    margin-bottom: 0.5rem;
+}
+
+.slots-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.slot-btn {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid #1a1a1a;
+    background: #fff;
+    color: #1a1a1a;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.slot-btn:hover {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+.slots-empty {
+    font-style: italic;
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.slots-loading {
+    color: #999;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.slots-error {
+    color: #c0392b;
+    font-size: 0.85rem;
+}
+
+.slots-error a {
+    color: #c0392b;
+}
+
+/* ---- Card Footer Links ---- */
+
+.card-links {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.resy-link {
+    font-size: 0.85rem;
+    color: #1a1a1a;
+}
+
+.phone-link {
+    font-size: 0.85rem;
+    color: #1a1a1a;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* ---- Footer ---- */
+
+.footer {
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.footer hr {
+    border: none;
+    border-top: 1px solid #d9cdb7;
+    margin-bottom: 1rem;
+}
+
+.footer p {
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+.footer a {
+    color: #1a1a1a;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 600px) {
+    .title {
+        font-size: 2rem;
+    }
+
+    .card-image {
+        height: 160px;
+    }
+
+    .availability-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn {
+        text-align: center;
+    }
+}
