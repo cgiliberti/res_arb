@@ -200,6 +200,15 @@ function renderCard(restaurant) {
     +     '<button class="btn" id="check-' + restaurant.id + '">Check Availability</button>'
     +   '</div>'
     +   '<div class="slots-section" id="slots-' + restaurant.id + '"></div>'
+    +   '<div class="notify-box">'
+    +     '<div class="notify-label">Get Notified at Drop Time</div>'
+    +     '<div class="notify-row">'
+    +       '<input type="email" class="notify-email" id="notify-email-' + restaurant.id + '"'
+    +       ' placeholder="your@email.com">'
+    +       '<button class="btn notify-btn" id="notify-btn-' + restaurant.id + '">Notify Me</button>'
+    +     '</div>'
+    +     '<div class="notify-status" id="notify-status-' + restaurant.id + '"></div>'
+    +   '</div>'
     +   '<div class="card-links">'
     +     '<a class="resy-link" href="' + restaurant.resyUrl + '" target="_blank" rel="noopener">\u2197 view on resy</a>'
     +     phoneHtml
@@ -284,6 +293,53 @@ function updateCountdowns() {
 }
 
 // ============================================================
+// Email Notifications
+// ============================================================
+
+function subscribeForNotify(restaurantId) {
+  var emailInput = document.getElementById('notify-email-' + restaurantId);
+  var statusEl = document.getElementById('notify-status-' + restaurantId);
+  var btn = document.getElementById('notify-btn-' + restaurantId);
+  var email = emailInput.value.trim();
+
+  if (!email || email.indexOf('@') === -1) {
+    statusEl.textContent = 'please enter a valid email.';
+    statusEl.className = 'notify-status error';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '...';
+  statusEl.textContent = '';
+  statusEl.className = 'notify-status';
+
+  fetch('/api/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, restaurants: [restaurantId] })
+  })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data.success) {
+        statusEl.textContent = data.message;
+        statusEl.className = 'notify-status success';
+        emailInput.value = '';
+      } else {
+        statusEl.textContent = data.error || 'something went wrong.';
+        statusEl.className = 'notify-status error';
+      }
+    })
+    .catch(function () {
+      statusEl.textContent = 'couldn\u2019t reach the server. try again?';
+      statusEl.className = 'notify-status error';
+    })
+    .finally(function () {
+      btn.disabled = false;
+      btn.textContent = 'Notify Me';
+    });
+}
+
+// ============================================================
 // Init
 // ============================================================
 
@@ -298,6 +354,12 @@ function init() {
     document.getElementById('check-' + restaurant.id)
       .addEventListener('click', function () {
         checkAvailability(restaurant.id);
+      });
+
+    // Bind notify button
+    document.getElementById('notify-btn-' + restaurant.id)
+      .addEventListener('click', function () {
+        subscribeForNotify(restaurant.id);
       });
   });
 
