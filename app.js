@@ -13,6 +13,7 @@ var RESTAURANTS = [
     description: 'French-Vietnamese bistro from the team behind Ha\u2019s Snack Bar.',
     note: 'Walk-ins possible \u2014 line up by 4:45 PM.',
     color: '#4a6741',
+    image: '/images/bistrot-ha.jpg',
     drop: { daysOut: 6, hour: 0, minute: 0 },
     dropLabel: '6 days out \u00b7 midnight ET',
     resyUrl: 'https://resy.com/cities/new-york-ny/venues/bistrot-ha'
@@ -26,6 +27,7 @@ var RESTAURANTS = [
     note: 'Most reservations are phone-only. Resy shows limited pre/post-theater times.',
     phone: '212-207-8562',
     color: '#1a3a5c',
+    image: '/images/polo-bar.jpg',
     drop: { daysOut: 30, hour: 10, minute: 0 },
     dropLabel: '30 days out \u00b7 10:00 AM ET',
     resyUrl: 'https://resy.com/cities/new-york-ny/venues/the-polo-bar'
@@ -38,6 +40,7 @@ var RESTAURANTS = [
     description: 'Neighborhood restaurant from the team behind King and Cervo\u2019s.',
     note: 'Bar seats are walk-in only (first come, first served).',
     color: '#8b4513',
+    image: '/images/corner-store.jpg',
     drop: { daysOut: 14, hour: 10, minute: 0 },
     dropLabel: '14 days out \u00b7 10:00 AM ET',
     resyUrl: 'https://resy.com/cities/new-york-ny/venues/the-corner-store'
@@ -150,7 +153,8 @@ function placeholderSVG(name, color) {
 function renderCard(restaurant) {
   var info = getDropInfo(restaurant);
   var defaultDate = formatDateISO(info.openDate);
-  var imgSrc = placeholderSVG(restaurant.name, restaurant.color);
+  var fallbackSrc = placeholderSVG(restaurant.name, restaurant.color);
+  var imgSrc = restaurant.image || fallbackSrc;
 
   var card = document.createElement('div');
   card.className = 'card';
@@ -165,7 +169,8 @@ function renderCard(restaurant) {
     : '';
 
   card.innerHTML = ''
-    + '<img class="card-image" id="img-' + restaurant.id + '" src="' + imgSrc + '" alt="' + restaurant.name + '">'
+    + '<img class="card-image" src="' + imgSrc + '" alt="' + restaurant.name + '"'
+    + ' onerror="this.onerror=null;this.src=\'' + fallbackSrc.replace(/'/g, "\\'") + '\'">'
     + '<div class="card-body">'
     +   '<div class="card-name">' + restaurant.name + '</div>'
     +   '<div class="card-address">' + restaurant.address + '</div>'
@@ -287,31 +292,6 @@ function updateCountdowns() {
 }
 
 // ============================================================
-// Restaurant Images (loaded from Resy API)
-// ============================================================
-
-function loadRestaurantImage(restaurant) {
-  fetch('/api/venue-image?slug=' + encodeURIComponent(restaurant.slug))
-    .then(function (res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    })
-    .then(function (data) {
-      if (data.image) {
-        var img = document.getElementById('img-' + restaurant.id);
-        if (img) {
-          var newImg = new Image();
-          newImg.onload = function () { img.src = data.image; };
-          newImg.src = data.image;
-        }
-      }
-    })
-    .catch(function () {
-      // Keep the placeholder SVG — no action needed
-    });
-}
-
-// ============================================================
 // Email Notifications
 // ============================================================
 
@@ -381,8 +361,6 @@ function init() {
         subscribeForNotify(restaurant.id);
       });
 
-    // Load real photo from Resy
-    loadRestaurantImage(restaurant);
   });
 
   // Tick countdowns every second
