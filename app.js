@@ -13,7 +13,7 @@ var RESTAURANTS = [
     description: 'French-Vietnamese bistro from the team behind Ha\u2019s Snack Bar.',
     note: 'Walk-ins possible \u2014 line up by 4:45 PM.',
     color: '#4a6741',
-    image: '/images/bistrot-ha.jpg',
+    emoji: '\uD83C\uDDFB\uD83C\uDDF3',
     drop: { daysOut: 6, hour: 0, minute: 0 },
     dropLabel: '6 days out \u00b7 midnight ET',
     resyUrl: 'https://resy.com/cities/new-york-ny/venues/bistrot-ha'
@@ -27,7 +27,7 @@ var RESTAURANTS = [
     note: 'Most reservations are phone-only. Resy shows limited pre/post-theater times.',
     phone: '212-207-8562',
     color: '#1a3a5c',
-    image: '/images/polo-bar.jpg',
+    emoji: '\uD83C\uDFC7',
     drop: { daysOut: 30, hour: 10, minute: 0 },
     dropLabel: '30 days out \u00b7 10:00 AM ET',
     resyUrl: 'https://resy.com/cities/new-york-ny/venues/the-polo-bar'
@@ -40,7 +40,7 @@ var RESTAURANTS = [
     description: 'Neighborhood restaurant from the team behind King and Cervo\u2019s.',
     note: 'Bar seats are walk-in only (first come, first served).',
     color: '#8b4513',
-    image: '/images/corner-store.jpg',
+    emoji: '\uD83C\uDF54',
     drop: { daysOut: 14, hour: 10, minute: 0 },
     dropLabel: '14 days out \u00b7 10:00 AM ET',
     resyUrl: 'https://resy.com/cities/new-york-ny/venues/the-corner-store'
@@ -128,7 +128,8 @@ function formatSlotTime(timeStr) {
 // Placeholder Images
 // ============================================================
 
-function placeholderSVG(name, color) {
+function placeholderSVG(name, color, emoji) {
+  var emojiPart = emoji || '';
   var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="740" height="220" viewBox="0 0 740 220">'
     + '<defs>'
     + '<pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">'
@@ -137,11 +138,13 @@ function placeholderSVG(name, color) {
     + '</defs>'
     + '<rect width="100%" height="100%" fill="' + color + '"/>'
     + '<rect width="100%" height="100%" fill="url(#dots)"/>'
-    + '<line x1="60" y1="90" x2="680" y2="90" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>'
-    + '<line x1="60" y1="130" x2="680" y2="130" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>'
-    + '<text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"'
-    + ' font-family="Georgia, serif" font-size="32" fill="rgba(255,255,255,0.6)"'
-    + ' font-style="italic" letter-spacing="2">' + name + '</text>'
+    + '<line x1="60" y1="80" x2="680" y2="80" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>'
+    + '<line x1="60" y1="140" x2="680" y2="140" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>'
+    + '<text x="50%" y="42%" text-anchor="middle" dominant-baseline="central"'
+    + ' font-size="56">' + emojiPart + '</text>'
+    + '<text x="50%" y="72%" text-anchor="middle" dominant-baseline="central"'
+    + ' font-family="Georgia, serif" font-size="26" fill="rgba(255,255,255,0.7)"'
+    + ' font-style="italic" letter-spacing="3">' + name + '</text>'
     + '</svg>';
   return 'data:image/svg+xml,' + encodeURIComponent(svg);
 }
@@ -153,7 +156,7 @@ function placeholderSVG(name, color) {
 function renderCard(restaurant) {
   var info = getDropInfo(restaurant);
   var defaultDate = formatDateISO(info.openDate);
-  var imgSrc = restaurant.image || placeholderSVG(restaurant.name, restaurant.color);
+  var imgSrc = placeholderSVG(restaurant.name, restaurant.color, restaurant.emoji);
 
   var card = document.createElement('div');
   card.className = 'card';
@@ -167,11 +170,8 @@ function renderCard(restaurant) {
     ? '<a class="phone-link" href="tel:' + restaurant.phone + '">' + restaurant.phone + '</a>'
     : '';
 
-  var fallbackSrc = placeholderSVG(restaurant.name, restaurant.color);
-
   card.innerHTML = ''
-    + '<img class="card-image" src="' + imgSrc + '" alt="' + restaurant.name + '"'
-    + ' onerror="this.onerror=null;this.src=\'' + fallbackSrc.replace(/'/g, "\\'") + '\'">'
+    + '<img class="card-image" src="' + imgSrc + '" alt="' + restaurant.name + '">'
     + '<div class="card-body">'
     +   '<div class="card-name">' + restaurant.name + '</div>'
     +   '<div class="card-address">' + restaurant.address + '</div>'
@@ -361,6 +361,7 @@ function init() {
       .addEventListener('click', function () {
         subscribeForNotify(restaurant.id);
       });
+
   });
 
   // Tick countdowns every second
