@@ -239,6 +239,60 @@ body {
     color: #c0392b;
 }
 
+/* ---- Notify Me ---- */
+
+.notify-box {
+    background: #f7f3eb;
+    border: 1px solid #d9cdb7;
+    padding: 0.75rem 1rem;
+    margin-top: 1.25rem;
+}
+
+.notify-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #999;
+    margin-bottom: 0.5rem;
+}
+
+.notify-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.notify-email {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #1a1a1a;
+    flex: 1;
+    min-width: 0;
+}
+
+.notify-btn {
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.notify-status {
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: 0.4rem;
+    min-height: 1.2em;
+}
+
+.notify-status.success {
+    color: #4a6741;
+}
+
+.notify-status.error {
+    color: #c0392b;
+}
+
 /* ---- Card Footer Links ---- */
 
 .card-links {
@@ -298,6 +352,15 @@ body {
     }
 
     .btn {
+        text-align: center;
+    }
+
+    .notify-row {
+        flex-direction: column;
+    }
+
+    .notify-btn {
+        width: 100%;
         text-align: center;
     }
 }

@@ -1,4 +1,14 @@
 {
+  "crons": [
+    {
+      "path": "/api/cron/notify",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/notify",
+      "schedule": "0 15 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

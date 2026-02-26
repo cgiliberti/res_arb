@@ -13,6 +13,7 @@ var RESTAURANTS = [
     description: 'French-Vietnamese bistro from the team behind Ha\u2019s Snack Bar.',
     note: 'Walk-ins possible \u2014 line up by 4:45 PM.',
     color: '#4a6741',
+    image: '/images/bistrot-ha.jpg',
     drop: { daysOut: 6, hour: 0, minute: 0 },
     dropLabel: '6 days out \u00b7 midnight ET',
     resyUrl: 'https://resy.com/cities/new-york-ny/venues/bistrot-ha'
@@ -26,6 +27,7 @@ var RESTAURANTS = [
     note: 'Most reservations are phone-only. Resy shows limited pre/post-theater times.',
     phone: '212-207-8562',
     color: '#1a3a5c',
+    image: '/images/polo-bar.jpg',
     drop: { daysOut: 30, hour: 10, minute: 0 },
     dropLabel: '30 days out \u00b7 10:00 AM ET',
     resyUrl: 'https://resy.com/cities/new-york-ny/venues/the-polo-bar'
@@ -38,6 +40,7 @@ var RESTAURANTS = [
     description: 'Neighborhood restaurant from the team behind King and Cervo\u2019s.',
     note: 'Bar seats are walk-in only (first come, first served).',
     color: '#8b4513',
+    image: '/images/corner-store.jpg',
     drop: { daysOut: 14, hour: 10, minute: 0 },
     dropLabel: '14 days out \u00b7 10:00 AM ET',
     resyUrl: 'https://resy.com/cities/new-york-ny/venues/the-corner-store'
@@ -127,10 +130,18 @@ function formatSlotTime(timeStr) {
 
 function placeholderSVG(name, color) {
   var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="740" height="220" viewBox="0 0 740 220">'
+    + '<defs>'
+    + '<pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">'
+    + '<circle cx="10" cy="10" r="1.2" fill="rgba(255,255,255,0.15)"/>'
+    + '</pattern>'
+    + '</defs>'
     + '<rect width="100%" height="100%" fill="' + color + '"/>'
+    + '<rect width="100%" height="100%" fill="url(#dots)"/>'
+    + '<line x1="60" y1="90" x2="680" y2="90" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>'
+    + '<line x1="60" y1="130" x2="680" y2="130" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>'
     + '<text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"'
-    + ' font-family="Georgia, serif" font-size="28" fill="rgba(255,255,255,0.5)"'
-    + ' font-style="italic">' + name + '</text>'
+    + ' font-family="Georgia, serif" font-size="32" fill="rgba(255,255,255,0.6)"'
+    + ' font-style="italic" letter-spacing="2">' + name + '</text>'
     + '</svg>';
   return 'data:image/svg+xml,' + encodeURIComponent(svg);
 }
@@ -142,7 +153,7 @@ function placeholderSVG(name, color) {
 function renderCard(restaurant) {
   var info = getDropInfo(restaurant);
   var defaultDate = formatDateISO(info.openDate);
-  var imgSrc = placeholderSVG(restaurant.name, restaurant.color);
+  var imgSrc = restaurant.image || placeholderSVG(restaurant.name, restaurant.color);
 
   var card = document.createElement('div');
   card.className = 'card';
@@ -156,8 +167,11 @@ function renderCard(restaurant) {
     ? '<a class="phone-link" href="tel:' + restaurant.phone + '">' + restaurant.phone + '</a>'
     : '';
 
+  var fallbackSrc = placeholderSVG(restaurant.name, restaurant.color);
+
   card.innerHTML = ''
-    + '<img class="card-image" src="' + imgSrc + '" alt="' + restaurant.name + '">'
+    + '<img class="card-image" src="' + imgSrc + '" alt="' + restaurant.name + '"'
+    + ' onerror="this.onerror=null;this.src=\'' + fallbackSrc.replace(/'/g, "\\'") + '\'">'
     + '<div class="card-body">'
     +   '<div class="card-name">' + restaurant.name + '</div>'
     +   '<div class="card-address">' + restaurant.address + '</div>'
@@ -186,6 +200,15 @@ function renderCard(restaurant) {
     +     '<button class="btn" id="check-' + restaurant.id + '">Check Availability</button>'
     +   '</div>'
     +   '<div class="slots-section" id="slots-' + restaurant.id + '"></div>'
+    +   '<div class="notify-box">'
+    +     '<div class="notify-label">Get Notified at Drop Time</div>'
+    +     '<div class="notify-row">'
+    +       '<input type="email" class="notify-email" id="notify-email-' + restaurant.id + '"'
+    +       ' placeholder="your@email.com">'
+    +       '<button class="btn notify-btn" id="notify-btn-' + restaurant.id + '">Notify Me</button>'
+    +     '</div>'
+    +     '<div class="notify-status" id="notify-status-' + restaurant.id + '"></div>'
+    +   '</div>'
     +   '<div class="card-links">'
     +     '<a class="resy-link" href="' + restaurant.resyUrl + '" target="_blank" rel="noopener">\u2197 view on resy</a>'
     +     phoneHtml
@@ -270,6 +293,53 @@ function updateCountdowns() {
 }
 
 // ============================================================
+// Email Notifications
+// ============================================================
+
+function subscribeForNotify(restaurantId) {
+  var emailInput = document.getElementById('notify-email-' + restaurantId);
+  var statusEl = document.getElementById('notify-status-' + restaurantId);
+  var btn = document.getElementById('notify-btn-' + restaurantId);
+  var email = emailInput.value.trim();
+
+  if (!email || email.indexOf('@') === -1) {
+    statusEl.textContent = 'please enter a valid email.';
+    statusEl.className = 'notify-status error';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '...';
+  statusEl.textContent = '';
+  statusEl.className = 'notify-status';
+
+  fetch('/api/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, restaurants: [restaurantId] })
+  })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+      if (data.success) {
+        statusEl.textContent = data.message;
+        statusEl.className = 'notify-status success';
+        emailInput.value = '';
+      } else {
+        statusEl.textContent = data.error || 'something went wrong.';
+        statusEl.className = 'notify-status error';
+      }
+    })
+    .catch(function () {
+      statusEl.textContent = 'couldn\u2019t reach the server. try again?';
+      statusEl.className = 'notify-status error';
+    })
+    .finally(function () {
+      btn.disabled = false;
+      btn.textContent = 'Notify Me';
+    });
+}
+
+// ============================================================
 // Init
 // ============================================================
 
@@ -284,6 +354,12 @@ function init() {
     document.getElementById('check-' + restaurant.id)
       .addEventListener('click', function () {
         checkAvailability(restaurant.id);
+      });
+
+    // Bind notify button
+    document.getElementById('notify-btn-' + restaurant.id)
+      .addEventListener('click', function () {
+        subscribeForNotify(restaurant.id);
       });
   });
 
