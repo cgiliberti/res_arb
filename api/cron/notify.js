@@ -24,7 +24,7 @@ function getETComponents() {
   new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/New_York',
     year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', hour12: false
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
   }).formatToParts(new Date()).forEach(function (p) {
     if (p.type !== 'literal') parts[p.type] = parseInt(p.value, 10);
   });
@@ -95,6 +95,7 @@ function generateUnsubToken(email) {
 }
 
 async function sendEmail(to, subject, html) {
+  var from = process.env.RESEND_FROM || 'res arb <onboarding@resend.dev>';
   var res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -102,12 +103,16 @@ async function sendEmail(to, subject, html) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from: 'res arb <onboarding@resend.dev>',
+      from: from,
       to: [to],
       subject: subject,
       html: html
     })
   });
+  if (!res.ok) {
+    var body = await res.text().catch(function () { return ''; });
+    console.error('Resend API error:', res.status, body);
+  }
   return res.ok;
 }
 

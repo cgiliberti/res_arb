@@ -61,7 +61,7 @@ function getETComponents() {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    hour12: false
+    hourCycle: 'h23'
   }).formatToParts(new Date()).forEach(function (p) {
     if (p.type !== 'literal') parts[p.type] = parseInt(p.value, 10);
   });
